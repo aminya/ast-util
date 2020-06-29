@@ -28,7 +28,7 @@
   "homepage": "https://github.com/aminya/ast-util",
   "devDependencies": {
     "esprima-fb": "15001.1001.0-dev-harmony-fb",
-    "mocha": "3.5.0",
+    "mocha": "8.0.1",
     "recast": "0.19.1"
   },
   "dependencies": {
