@@ -1,6 +1,6 @@
 {
-  "name": "ast-util",
-  "version": "0.6.0",
+  "name": "ast-util-plus",
+  "version": "0.6.2",
   "description": "Utilities for AST transformers.",
   "main": "lib/index.js",
   "directories": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/eventualbuddha/ast-util.git"
+    "url": "git://github.com/aminya/ast-util.git"
   },
   "keywords": [
     "ast",
@@ -23,9 +23,9 @@
   "author": "Brian Donovan",
   "license": "Apache 2",
   "bugs": {
-    "url": "https://github.com/eventualbuddha/ast-util/issues"
+    "url": "https://github.com/aminya/ast-util/issues"
   },
-  "homepage": "https://github.com/eventualbuddha/ast-util",
+  "homepage": "https://github.com/aminya/ast-util",
   "devDependencies": {
     "esprima-fb": "15001.1001.0-dev-harmony-fb",
     "mocha": "3.5.0",

@@ -203,7 +203,7 @@ example.
 
 ## Contributing
 
-[![Build Status](https://travis-ci.org/eventualbuddha/ast-util.png?branch=master)](https://travis-ci.org/eventualbuddha/ast-util)
+[![Build Status](https://travis-ci.org/aminya/ast-util.png?branch=master)](https://travis-ci.org/aminya/ast-util)
 
 
 ### Setup
