@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/aminya/ast-util.git"
+    "url": "git://github.com/aminya/ast-util-plus.git"
   },
   "keywords": [
     "ast",
@@ -23,9 +23,9 @@
   "author": "Brian Donovan",
   "license": "Apache 2",
   "bugs": {
-    "url": "https://github.com/aminya/ast-util/issues"
+    "url": "https://github.com/aminya/ast-util-plus/issues"
   },
-  "homepage": "https://github.com/aminya/ast-util",
+  "homepage": "https://github.com/aminya/ast-util-plus",
   "devDependencies": {
     "esprima-fb": "15001.1001.0-dev-harmony-fb",
     "mocha": "8.0.1",
