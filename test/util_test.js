@@ -1,18 +1,18 @@
 /* jshint node:true, mocha:true, undef:true, unused:true */
 
-var util = require('../lib');
+const util = require('../lib');
 
-var recast = require('recast');
-var esprima = require('esprima-fb');
-var types = recast.types;
-var n = types.namedTypes;
-var b = types.builders;
-var NodePath = types.NodePath;
+const recast = require('recast');
+const esprima = require('esprima-fb');
+const { types } = recast;
+const n = types.namedTypes;
+const b = types.builders;
+const { NodePath } = types;
 
-var assert = require('assert');
+const assert = require('assert');
 
 function parse(source) {
-  return recast.parse(source, { esprima: esprima });
+  return recast.parse(source, { esprima });
 }
 
 function normalize(source) {
@@ -20,9 +20,9 @@ function normalize(source) {
 }
 
 function processIt(source, callback) {
-  var ast = parse(source);
+  const ast = parse(source);
   types.visit(ast, {
-    visitIdentifier: function(path) {
+    visitIdentifier(path) {
       if (path.value.name === 'IT') {
         callback.call(path, path.value);
         return false;
@@ -48,7 +48,7 @@ describe('#uniqueIdentifier', function() {
   // Looks for an `IT` identifier and asserts that the first valid unique
   // identifier in that scope matches `expected`.
   function check(source, expected, name) {
-    var identifier;
+    let identifier;
 
     processIt(source, function() {
       identifier = util.uniqueIdentifier(this.scope, name);
@@ -104,20 +104,20 @@ describe('#uniqueIdentifier', function() {
 
 describe('#isUsed', function() {
   function check(source, names, expected) {
-    var ast = parse(source).program;
-    var rootPath = new NodePath({ root: ast });
-    var globalScope = rootPath.get('root').scope;
+    const ast = parse(source).program;
+    const rootPath = new NodePath({ root: ast });
+    const globalScope = rootPath.get('root').scope;
 
     if (typeof names === 'string') {
       names = [names];
     }
 
     names.forEach(function(name) {
-      var actual = util.isUsed(globalScope, name);
+      const actual = util.isUsed(globalScope, name);
 
       assert.ok(
         actual === expected,
-        'expected `' + name + '` ' +
+        `expected \`${name}\` ` +
         (expected ? '' : 'not ') +
         'to be used globally by `' + JSON.stringify(source) + '`'
       );
@@ -152,7 +152,7 @@ describe('#isReference', function() {
         assert.equal(
           util.isReference(this),
           expected,
-          'expected `IT` in `' + source + '` to ' +
+          `expected \`IT\` in \`${source}\` to ` +
             (expected ? '' : 'not ') + 'be a reference'
         );
       }
@@ -185,9 +185,7 @@ describe('#isReference', function() {
   });
 
   it('is true for variable references', function() {
-    check('var IT; foo(IT);', true, function(path) {
-      return n.CallExpression.check(path.parent.value);
-    });
+    check('var IT; foo(IT);', true, path => n.CallExpression.check(path.parent.value));
   });
 
   it('is false for property keys', function() {
@@ -196,9 +194,7 @@ describe('#isReference', function() {
 
   it('is true for property values', function() {
     check('({a: IT})', true);
-    check('({IT: IT})', true, function(path) {
-      return path.parent.value === path.value;
-    });
+    check('({IT: IT})', true, path => path.parent.value === path.value);
   });
 
   it('is true for variable initial values', function() {
@@ -207,14 +203,12 @@ describe('#isReference', function() {
 
   it('is false for labeled statements', function() {
     check('IT: 1', false);
-    check('IT: IT', true, function(path) {
-      return n.ExpressionStatement.check(path.parent.value);
-    });
+    check('IT: IT', true, path => n.ExpressionStatement.check(path.parent.value));
   });
 
   it('can check names', function() {
     types.visit(parse('a'), {
-      visitIdentifier: function(path) {
+      visitIdentifier(path) {
         assert.ok(util.isReference(path, 'a'));
         assert.ok(!util.isReference(path, 'b'));
         return false;
@@ -253,8 +247,8 @@ describe('#isReference', function() {
 
 describe('#injectVariable', function() {
   it('creates a variable in the scope node', function() {
-    var identifier = b.identifier('a');
-    var ast = processIt('function foo(){ IT; }', function() {
+    const identifier = b.identifier('a');
+    const ast = processIt('function foo(){ IT; }', function() {
       assert.strictEqual(
         util.injectVariable(this.scope, identifier),
         identifier
@@ -265,11 +259,11 @@ describe('#injectVariable', function() {
   });
 
   it('marks the variable as bound in the given scope', function() {
-    var identifier = b.identifier('a');
-    var scope;
+    const identifier = b.identifier('a');
+    let scope;
 
     processIt('function foo(){ IT; }', function() {
-      scope = this.scope;
+      ({ scope } = this);
       assert.strictEqual(
         util.injectVariable(scope, identifier),
         identifier
@@ -281,7 +275,7 @@ describe('#injectVariable', function() {
   });
 
   it('can create a variable with an initial value', function() {
-    var ast = processIt('IT;', function() {
+    const ast = processIt('IT;', function() {
       util.injectVariable(
         this.scope,
         b.identifier('hasOwnProp'),
@@ -301,10 +295,10 @@ describe('#injectVariable', function() {
   });
 
   it('can inject a variable in a scope at a position that is later replaced', function() {
-    var ast = parse('var a;');
+    const ast = parse('var a;');
 
     types.visit(ast, {
-      visitVariableDeclaration: function(path) {
+      visitVariableDeclaration(path) {
         util.injectVariable(path.scope, b.identifier('b'));
         return b.expressionStatement(
           b.callExpression(b.identifier('replacement'), [])
@@ -319,7 +313,7 @@ describe('#injectVariable', function() {
   });
 
   it('injects after any global "use strict" pragma', function() {
-    var ast = processIt('"use strict"; IT;', function() {
+    const ast = processIt('"use strict"; IT;', function() {
       util.injectVariable(
         this.scope,
         b.identifier('a'),
@@ -331,7 +325,7 @@ describe('#injectVariable', function() {
   });
 
   it('injects after any local "use strict" pragma', function() {
-    var ast = processIt('function getIt() { "use strict"; return IT; }', function() {
+    const ast = processIt('function getIt() { "use strict"; return IT; }', function() {
       util.injectVariable(
         this.scope,
         b.identifier('a'),
@@ -344,7 +338,7 @@ describe('#injectVariable', function() {
 });
 
 describe('#injectShared', function() {
-  var hasOwnPropAST = b.memberExpression(
+  const hasOwnPropAST = b.memberExpression(
     b.memberExpression(
       b.identifier('Object'),
       b.identifier('prototype'),
@@ -354,7 +348,7 @@ describe('#injectShared', function() {
     false
   );
 
-  var arraySliceAST = b.memberExpression(
+  const arraySliceAST = b.memberExpression(
     b.memberExpression(
       b.identifier('Array'),
       b.identifier('prototype'),
@@ -365,7 +359,7 @@ describe('#injectShared', function() {
   );
 
   it('can inject a shared value', function() {
-    var ast = processIt('IT;', function() {
+    const ast = processIt('IT;', function() {
       assert.equal(
         util.injectShared(
           this.scope,
@@ -407,7 +401,7 @@ describe('#injectShared', function() {
 
 describe('#callHasOwnProperty', function() {
   it('returns a CallExpression with the given object and property', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callHasOwnProperty(this.scope, node, 'is'));
     });
 
@@ -421,7 +415,7 @@ describe('#callHasOwnProperty', function() {
 
 describe('#callGetOwnPropertyDescriptor', function() {
   it('returns a CallExpression with the given object and property', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callGetOwnPropertyDescriptor(this.scope, node, 'is'));
     });
 
@@ -435,7 +429,7 @@ describe('#callGetOwnPropertyDescriptor', function() {
 
 describe('#callGetPrototypeOf', function() {
   it('returns a CallExpression with the given object', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callGetPrototypeOf(this.scope, node));
     });
 
@@ -449,7 +443,7 @@ describe('#callGetPrototypeOf', function() {
 
 describe('#callArraySlice', function() {
   it('returns a CallExpression with the given object and omits missing begin/end', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callArraySlice(this.scope, node));
     });
 
@@ -461,7 +455,7 @@ describe('#callArraySlice', function() {
   });
 
   it('returns a CallExpression with the given object and begin/end', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callArraySlice(this.scope, node, 1, 2));
     });
 
@@ -475,7 +469,7 @@ describe('#callArraySlice', function() {
 
 describe('#callFunctionBind', function() {
   it('uses call when given args as an array', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callFunctionBind(
         this.scope,
         node,
@@ -492,7 +486,7 @@ describe('#callFunctionBind', function() {
   });
 
   it('uses apply when given args as an expression', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callFunctionBind(
         this.scope,
         node,
@@ -511,7 +505,7 @@ describe('#callFunctionBind', function() {
 
 describe('#callGetIterator', function() {
   it('calls the get iterator helper', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callGetIterator(
         this.scope, node
       ));
@@ -554,7 +548,7 @@ describe('#callGetIterator', function() {
 
 describe('#callGetIteratorRange', function() {
   it('calls the get iterator range helper', function() {
-    var ast = processIt('IT;', function(node) {
+    const ast = processIt('IT;', function(node) {
       this.replace(util.callGetIteratorRange(
         this.scope, node, b.literal(1), b.literal(2), b.literal(3)
       ));
@@ -593,9 +587,7 @@ describe('#callGetIteratorRange', function() {
 describe('#getGlobals', function() {
   function check(source, globals) {
     assert.deepEqual(
-      util.getGlobals(parse(source).program).map(function(identifier) {
-        return identifier.name;
-      }),
+      util.getGlobals(parse(source).program).map(identifier => identifier.name),
       globals
     );
   }
