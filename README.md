@@ -1,11 +1,11 @@
-# ast-util
+# ast-util-plus
 
 Utilities for AST transformers.
 
 ## Install
 
 ```
-$ npm install [--save] ast-util
+$ npm install ast-util-plus
 ```
 
 ## API
