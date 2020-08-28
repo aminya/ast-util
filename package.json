@@ -1,6 +1,6 @@
 {
   "name": "ast-util-plus",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Utilities for AST transformers.",
   "main": "lib/index.js",
   "directories": {
