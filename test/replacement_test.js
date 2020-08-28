@@ -1,16 +1,16 @@
 /* jshint node:true, mocha:true, undef:true, unused:true */
 
-var Replacement = require('../lib').Replacement;
-var assert = require('assert');
+const { Replacement } = require('../lib');
+const assert = require('assert');
 
 describe('Replacement', function() {
-  var nodePath;
+  let nodePath;
 
   function makeNodePath() {
-    var node = {};
+    const node = {};
     return {
-      node: node,
-      replace: function() {
+      node,
+      replace() {
         this.replacedWith = [].slice.call(arguments);
       }
     };
@@ -22,7 +22,7 @@ describe('Replacement', function() {
 
   describe('.removes', function() {
     it('creates a Replacement that replaces with nothing', function() {
-      var repl = Replacement.removes(nodePath);
+      const repl = Replacement.removes(nodePath);
       repl.replace();
       assert.equal(nodePath.replacedWith.length, 0);
     });
@@ -30,17 +30,17 @@ describe('Replacement', function() {
 
   describe('.swaps', function() {
     it('creates a Replacement that replaces with another', function() {
-      var swappedIn = {};
-      var repl = Replacement.swaps(nodePath, swappedIn);
+      const swappedIn = {};
+      const repl = Replacement.swaps(nodePath, swappedIn);
       repl.replace();
       assert.equal(nodePath.replacedWith.length, 1);
       assert.strictEqual(nodePath.replacedWith[0], swappedIn);
     });
 
     it('creates a Replacement that replaces with a list', function() {
-      var swappedIn1 = {};
-      var swappedIn2 = {};
-      var repl = Replacement.swaps(nodePath, [swappedIn1, swappedIn2]);
+      const swappedIn1 = {};
+      const swappedIn2 = {};
+      const repl = Replacement.swaps(nodePath, [swappedIn1, swappedIn2]);
       repl.replace();
       assert.equal(nodePath.replacedWith.length, 2);
       assert.strictEqual(nodePath.replacedWith[0], swappedIn1);
@@ -50,9 +50,9 @@ describe('Replacement', function() {
 
   describe('.adds', function() {
     it('creates a Replacement that adds additional nodes', function() {
-      var added1 = {};
-      var added2 = {};
-      var repl = Replacement.adds(nodePath, [added1, added2]);
+      const added1 = {};
+      const added2 = {};
+      const repl = Replacement.adds(nodePath, [added1, added2]);
       repl.replace();
       assert.equal(nodePath.replacedWith.length, 3);
       assert.strictEqual(nodePath.replacedWith[0], nodePath.node);
@@ -62,11 +62,11 @@ describe('Replacement', function() {
   });
 
   describe('.map', function() {
-    var from1;
-    var from2;
-    var nodeArrayPath;
-    var to1;
-    var to2;
+    let from1;
+    let from2;
+    let nodeArrayPath;
+    let to1;
+    let to2;
 
     beforeEach(function() {
       from1 = makeNodePath();
@@ -78,13 +78,13 @@ describe('Replacement', function() {
     });
 
     it('creates a Replacement with the results of the map', function() {
-      var repl = Replacement.map(nodeArrayPath, function(nodePath) {
+      const repl = Replacement.map(nodeArrayPath, function(nodePath) {
         if (nodePath === from1) {
           return Replacement.swaps(nodePath, to1);
         } else if (nodePath === from2) {
           return Replacement.swaps(nodePath, to2);
         } else {
-          assert.ok(false, 'unexpected argument to callback: ' + nodePath);
+          assert.ok(false, `unexpected argument to callback: ${nodePath}`);
         }
       });
 
@@ -97,13 +97,13 @@ describe('Replacement', function() {
     });
 
     it('ignores null returns from the callback', function() {
-      var repl = Replacement.map(nodeArrayPath, function(nodePath) {
+      const repl = Replacement.map(nodeArrayPath, function(nodePath) {
         if (nodePath === from1) {
           return Replacement.swaps(nodePath, to1);
         } else if (nodePath === from2) {
           return null;
         } else {
-          assert.ok(false, 'unexpected argument to callback: ' + nodePath);
+          assert.ok(false, `unexpected argument to callback: ${nodePath}`);
         }
       });
 
@@ -117,9 +117,9 @@ describe('Replacement', function() {
 
   describe('#and', function() {
     it('adds the given Replacement to the receiver', function() {
-      var node1 = {};
-      var anotherNodePath = makeNodePath();
-      var repl = Replacement.swaps(
+      const node1 = {};
+      const anotherNodePath = makeNodePath();
+      const repl = Replacement.swaps(
         nodePath, node1
       ).and(
         Replacement.removes(anotherNodePath)

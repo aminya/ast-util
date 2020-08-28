@@ -1,7 +1,7 @@
 (function(array) {
-  var index = 0;
+  let index = 0;
   return {
-    next: function() {
+    next() {
       if (index < array.length) {
         return {
           done: false,

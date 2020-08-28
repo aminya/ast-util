@@ -1,7 +1,7 @@
 (function get(object, property, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
+  const desc = Object.getOwnPropertyDescriptor(object, property);
   if (desc === void 0) {
-    var parent = Object.getPrototypeOf(object);
+    const parent = Object.getPrototypeOf(object);
     if (parent === null) {
       return void 0;
     } else {
@@ -10,7 +10,7 @@
   } else if ('value' in desc && 'writable' in desc) {
     return desc.value;
   } else {
-    var getter = desc.get;
+    const getter = desc.get;
     if (getter === void 0) {
       return void 0;
     }

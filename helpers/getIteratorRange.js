@@ -6,9 +6,9 @@
     len = Infinity;
   }
 
-  var range = [], end = begin + len;
+  const range = [], end = begin + len;
   while (index < end) {
-    var next = iterator.next();
+    const next = iterator.next();
     if (next.done) {
       break;
     }
@@ -19,7 +19,7 @@
   }
 
   return {
-    range: range,
-    index: index
+    range,
+    index
   };
 });

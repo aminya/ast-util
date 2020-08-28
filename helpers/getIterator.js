@@ -1,5 +1,5 @@
 (function(iterable) {
-  var sym = typeof Symbol === "function" && Symbol.iterator || "@@iterator";
+  const sym = typeof Symbol === "function" && Symbol.iterator || "@@iterator";
 
   if (typeof iterable[sym] === "function") {
     return iterable[sym]();
